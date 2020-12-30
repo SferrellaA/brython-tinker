@@ -1,0 +1,101 @@
+<html>
+    <head>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.9.0/brython.min.js"></script>
+		<link rel="stylesheet" href="https://unpkg.com/spcss">
+    </head>
+    <body onload="brython()">
+        <script type="text/python">
+		'''
+		from browser.html import BUTTON
+		def create(event):
+		document["mybutton"].bind("click", create)
+		<button id="mybutton">click!</button>
+		'''
+		from browser import document, alert
+
+		def create_codeblock(text):
+			from browser.html import PRE
+			code = document.createElement("code")
+			code <= text
+			document <= PRE(code)
+
+		def clean_text(text):
+			if '\n' in text:
+				text = text.replace('\n', '<br>')
+			if '`' in text:
+				segments = text.split('`')
+				for i in range(0, len(segments)):
+					if i % 2 == 1:
+						segments[i] = "<code>" + segments[i] + "</code>"
+				text = ''.join(segments)
+			# TODO - check markdown links, make pictures turn into the thing
+			return text
+		
+		def create_paragraph(text):
+			from browser.html import P
+			text = clean_text(text)
+			document <= P(text)
+
+		def create_blockquote(text):
+			block = document.createElement("blockquote")
+			block <= text
+			document <= block
+
+		def create_title(raw_text):
+			from browser.html import H1
+			text = raw_text.lstrip('#')
+			size = len(raw_text) - len(text)
+			if size <= 1:
+				from browser.html import H1 as header
+			elif size == 2:
+				from browser.html import H2 as header
+			elif size == 3:
+				from browser.html import H3 as header
+			elif size == 4:
+				from browser.html import H4 as header
+			elif size == 5:
+				from browser.html import H5 as header
+			else:
+				from browser.html import H6 as header
+			document <= header(text)
+
+		def create_image(source, *args):
+			from browser.html import IMG
+			altText = ''
+			if len(args) > 0:
+				altText = args[0]
+			image = IMG(src=source, alt=altText, title=altText)
+			if len(args) == 2:
+				from browser.html import FIGURE, FIGCAPTION
+				figure = FIGURE()
+				figure <= image
+				figure <= FIGCAPTION(clean_text(args[1]))
+				document <= figure
+			else:
+				from browser.html import P
+				document <= P(image)
+
+		create_title("# Main Title")
+		create_paragraph("This is the main introduction to the test page")
+		create_title("## Sub Title One")
+		create_paragraph("This is my sectional paragraph, with an &")
+		create_paragraph("""And a 
+			multiline secondary paragraph 
+			for that one""")
+		create_paragraph("This `is` a\n `code` test")
+		create_title("## Codeblock Test")
+		create_codeblock("""1---5---10---15---20---25---30---35---40---45---50---55---60---65---70---75---80---85---90---95--100--105--110--115--120--125--130--135--140--145--150--155--160--165--170--175--180--185--190--195--200--205--210--215--220--225--230--235--240--245--250--255--260--265--270--275--280--285--290--295--300
+			printf(\"hello world\")
+			test with &
+		""")
+		create_title("##blockquote test")
+		create_paragraph("Here's the conclusion")
+		create_blockquote("This is a blockquote")
+		create_blockquote("This is a really long block quote. \nIn a moment I'm just going to copy/paste a lorem ipsum or something because I don't really want to type all this out. Or maybe I will - it'll be a good thing for me to practive doing.")
+		create_title("##image test")
+		create_image('https://i.imgur.com/UrJrpo1.png')
+		create_image('https://i.imgur.com/UrJrpo1.png', "this is my alt text")
+		create_image('https://i.imgur.com/UrJrpo1.png', "the alt text", "the figure caption\n`testtesttest`")
+        </script>
+    </body>
+</html>
